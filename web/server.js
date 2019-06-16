@@ -1,10 +1,18 @@
 import express from 'express';
 import path from 'path';
-import requestInterceptor from './middlewares/request-interceptor';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import authRoute from './routes/authRoute';
+import requestInterceptor from './middlewares/request-interceptor';
 
 const app = express();
+
+//Instantiate router
+const router = express.Router();
+
+//added router to out app
+app.use(router);
+
 app.use(cookieParser());
 
 /*Our browser needs to access assets through url like images/css/etc.
@@ -16,9 +24,8 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 then it will run on default slash / */
 //app.use(express.static(path.join(__dirname, 'assets')));
 
-//In function middleware
+//Middleware function, it's like an interceptor for incoming request
 app.use(function (req, res, next) {
-  //Middleware function, it's like an interceptor to incoming request
   console.log('url ', req.url, 'Time: %d', Date.now());
   next();
 });
@@ -29,18 +36,18 @@ app.use(requestInterceptor('Request interceptor'));
 //Running multiple middlewares one by one.
 app.use(requestInterceptor('MW1'), requestInterceptor('MW2'), requestInterceptor('MW3'));
 
-app.get('/', requestInterceptor('before get'), (req, res) => {
+router.get('/', requestInterceptor('before get'), (req, res) => {
   //if we don't use cookie parser we will get cookie
   //in req.header.cookie as "key=value"
   //Here we are using cookie-parser so we can get it as req.cookies
-  console.log("req.cookies", req.cookies);
   res.send('Hello Nimish');
 });
 
+//Implemented nested route
+router.use('/auth', authRoute);
+
 //post call using body parser
-app.post('/postData', bodyParser.json(), function (req, res, next) {
-  console.log(req.query);
-  console.log(req.body);
+router.post('/postData', bodyParser.json(), function (req, res, next) {
   res.sendStatus(200);
 });
 
