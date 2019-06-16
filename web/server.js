@@ -2,8 +2,10 @@ import express from 'express';
 import path from 'path';
 import requestInterceptor from './middlewares/request-interceptor';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 const app = express();
+app.use(cookieParser());
 
 /*Our browser needs to access assets through url like images/css/etc.
 Node will restrict it's access so we need to use static middleware.
@@ -28,6 +30,10 @@ app.use(requestInterceptor('Request interceptor'));
 app.use(requestInterceptor('MW1'), requestInterceptor('MW2'), requestInterceptor('MW3'));
 
 app.get('/', requestInterceptor('before get'), (req, res) => {
+  //if we don't use cookie parser we will get cookie
+  //in req.header.cookie as "key=value"
+  //Here we are using cookie-parser so we can get it as req.cookies
+  console.log("req.cookies", req.cookies);
   res.send('Hello Nimish');
 });
 
