@@ -1,7 +1,17 @@
 import express from 'express';
+import path from 'path';
 import requestInterceptor from './middlewares/request-interceptor';
 
 const app = express();
+
+/*Our browser needs to access assets through url like images/css/etc.
+Node will restrict it's access so we need to use static middleware.
+And tell node that they are our static assets and we want to access it directly.*/
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
+/*If we only give static middleware as shown below, 
+then it will run on default slash / */
+//app.use(express.static(path.join(__dirname, 'assets')));
 
 //In function middleware
 app.use(function (req, res, next) {
