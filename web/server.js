@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import requestInterceptor from './middlewares/request-interceptor';
+import bodyParser from 'body-parser';
 
 const app = express();
 
@@ -28,7 +29,13 @@ app.use(requestInterceptor('MW1'), requestInterceptor('MW2'), requestInterceptor
 
 app.get('/', requestInterceptor('before get'), (req, res) => {
   res.send('Hello Nimish');
+});
 
+//post call using body parser
+app.post('/postData', bodyParser.json(), function (req, res, next) {
+  console.log(req.query);
+  console.log(req.body);
+  res.sendStatus(200);
 });
 
 // Below one is to catch error it has error as first parameter.
