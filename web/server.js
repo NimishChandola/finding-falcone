@@ -36,6 +36,14 @@ app.use(requestInterceptor('Request interceptor'));
 //Running multiple middlewares one by one.
 app.use(requestInterceptor('MW1'), requestInterceptor('MW2'), requestInterceptor('MW3'));
 
+//This is my authentication middleware.
+const requireAuthentication = function (req, res, next) {
+  console.log("Every request require authentication");
+  next();
+};
+
+router.all('*', requireAuthentication);
+
 router.get('/', requestInterceptor('before get'), (req, res) => {
   //if we don't use cookie parser we will get cookie
   //in req.header.cookie as "key=value"
@@ -43,13 +51,13 @@ router.get('/', requestInterceptor('before get'), (req, res) => {
   res.send('Hello Nimish');
 });
 
-//Implemented nested route
-router.use('/auth', authRoute);
-
 //post call using body parser
 router.post('/postData', bodyParser.json(), function (req, res, next) {
   res.sendStatus(200);
 });
+
+//Implemented nested route
+router.use('/auth', authRoute);
 
 // Below one is to catch error it has error as first parameter.
 //Error handling is typically used across the whole application, 
@@ -59,6 +67,11 @@ app.use(function (err, req, res, next) {
   //Error first approach.
   console.log('error caught here.', err);
 });
+
+// res.sendStatus(200) // equivalent to res.status(200).send('OK')
+// res.sendStatus(403) // equivalent to res.status(403).send('Forbidden')
+// res.sendStatus(404) // equivalent to res.status(404).send('Not Found')
+// res.sendStatus(500) // equivalent to res.status(500).send('Internal Server Error')
 
 app.listen(3000, () => {
   console.log("server is listening on port...")
